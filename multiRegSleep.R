@@ -168,4 +168,104 @@ cor(SleepHrs, sleepData$moderateStress)# -0.03
 cor(SleepHrs, sleepData$highStress)# -0.44
 cor(SleepHrs, sleepData$extremeStress)# -0.6
 
+# dump mild, moderate and high stress from the model as they have a low correlation
+sleepData <- sleepData[c(1:9, 13)]
+# rebuild model
+model <- lm(formula = SleepHrs ~ SnoringRate + RespirationRate + 
+              BodyTemp + Movement + BloodOxygen + 
+              REM + HeartRate + noStress + extremeStress,
+            data = sleepData)
+summary(model) # Adjusted R-squared = 0.9996
 
+
+# normality
+with(sleepData, {
+  qqnorm(SnoringRate, 
+         main = "Normality analysis of Snoring Rate data")
+  qqline(SnoringRate)
+})
+
+with(sleepData, {
+  qqnorm(RespirationRate, 
+         main = "Normality analysis of Respiration Rate data")
+  qqline(RespirationRate)
+})
+
+with(sleepData, {
+  qqnorm(BodyTemp, 
+         main = "Normality analysis of Body Temp data")
+  qqline(BodyTemp)
+})
+
+with(sleepData, {
+  qqnorm(Movement, 
+         main = "Normality analysis of Movement data")
+  qqline(Movement)
+})
+
+with(sleepData, {
+  qqnorm(BloodOxygen, 
+         main = "Normality analysis of Blood Oxygen data")
+  qqline(BloodOxygen)
+})
+
+with(sleepData, {
+  qqnorm(REM, 
+         main = "Normality analysis of REM data")
+  qqline(REM)
+})
+
+with(sleepData, {
+  qqnorm(HeartRate, 
+         main = "Normality analysis of REM data")
+  qqline(HeartRate)
+})
+
+# normality of categorical data
+with(sleepData, {
+  qqnorm(SleepHrs[noStress == 1], 
+         main = "Normality analysis of REM data")
+  qqline(SleepHrs[noStress == 1])
+})
+
+with(sleepData, {
+  qqnorm(SleepHrs[noStress == 0], 
+         main = "Normality analysis of REM data")
+  qqline(SleepHrs[noStress == 0])
+})
+
+normality_test <- shapiro.test(SnoringRate)
+normality_test$p.value # 5.150978e-21
+
+normality_test <- shapiro.test(RespirationRate)
+normality_test$p.value # 1.579149e-15
+
+normality_test <- shapiro.test(SleepHrs)
+normality_test$p.value # 2.166796e-20
+
+normality_test <- shapiro.test(REM)
+normality_test$p.value # 1.315245e-15
+
+normality_test <- shapiro.test(Movement)
+normality_test$p.value # 3.218008e-14
+
+normality_test <- shapiro.test(HeartRate)
+normality_test$p.value # 1.570963e-15
+
+normality_test <- shapiro.test(BodyTemp)
+normality_test$p.value # 7.014186e-09
+
+normality_test <- shapiro.test(BloodOxygen)
+normality_test$p.value # 1.347201e-11
+
+normality_test <- shapiro.test(SleepHrs[noStress == 1])
+normality_test$p.value # 0.0002949122
+
+normality_test <- shapiro.test(SleepHrs[noStress == 0])
+normality_test$p.value # 6.815756e-20
+
+normality_test <- shapiro.test(SleepHrs[extremeStress == 1])
+normality_test$p.value # 6.815756e-20
+
+normality_test <- shapiro.test(SleepHrs[extremeStress == 0])
+normality_test$p.value # 1.792434e-13
