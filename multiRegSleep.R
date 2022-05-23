@@ -9,6 +9,8 @@ colnames(sleepData) <- c('SnoringRate', 'RespirationRate',
 sleepData$StressCat <- factor(sleepData$StressLevel, 
                               labels = c("no stress", "mild stress", "moderated stress", "high stress", "extreme stress"),
                               ordered = TRUE)
+attach(sleepData)
+kruskal.test(SleepHrs, StressCat)
 
 install.packages("psych")
 library(psych)
@@ -74,7 +76,8 @@ sleepData$REM <- round(sleepData$REM, 1)
 sleepData$SleepHrs <- round(sleepData$SleepHrs, 1)
 sleepData$HeartRate <- round(sleepData$HeartRate, 1)
 
-
+opar <- par(no.readonly = TRUE)
+par(mfrow = c(3, 3)) # divide graph area in 2 columns
 # Check assumptions
 # correlation
 # there must be a correlation between sleepHrs and the other variables
@@ -133,25 +136,22 @@ scatter.smooth(x=sleepData$noStress,
                xlab = "No Stress",
                ylab = "Sleep duration in hours")
 
-boxplot(sleepData$noStress, SleepHrs, main = "Sleep duration ~ no Stress",
-     xlab = "No Stress",
-     ylab = "Sleep duration in hours")
+#sleepData$noStress <- factor(sleepData$noStress, 
+#                              labels = c("no stress", "stress"),
+#                              ordered = TRUE)
 
-boxplot(sleepData$mildStress, SleepHrs, main = "Sleep duration ~ mild Stress",
-        xlab = "mild Stress",
-        ylab = "Sleep duration in hours")
+par(mfrow = c(1, 1))
+par <- opar
+boxplot(SleepHrs[noStress==1], SleepHrs[mildStress==1], SleepHrs[moderateStress==1], SleepHrs[highStress==1], SleepHrs[extremeStress==1], 
+        main = "Sleep duration ~ Stress level",
+        xlab = "Stress level",
+        ylab = "Sleep duration in hours",
+        col = "blue")
+axis(1,
+     at = 1:5,
+     labels = c("no stress", "mild", "moderate", "high", "extreme"),
+     las = 1)
 
-plot(sleepData$moderateStress, SleepHrs, main = "Sleep duration ~ moderate Stress",
-        xlab = "moderate Stress",
-        ylab = "Sleep duration in hours")
-
-boxplot(sleepData$highStress, SleepHrs, main = "Sleep duration ~ high Stress",
-        xlab = "high Stress",
-        ylab = "Sleep duration in hours")
-
-boxplot(sleepData$extremeStress, SleepHrs, main = "Sleep duration ~ extreme Stress",
-        xlab = "extreme Stress",
-        ylab = "Sleep duration in hours")
 
 # test for correlation
 # anything below 0.3 is week
@@ -177,7 +177,60 @@ model <- lm(formula = SleepHrs ~ SnoringRate + RespirationRate +
             data = sleepData)
 summary(model) # Adjusted R-squared = 0.9996
 
+opar <- par(no.readonly = TRUE) # records current settings for plots
+par(mfrow = c(4,2)) # plot side by side
 
+# testing for normality
+hist(SleepHrs, 
+     main = "Sleep hours", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Sleep hours")
+
+hist(Movement, 
+     main = "Movement", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Movement")
+
+hist(REM, 
+     main = "REM in minutes", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "REM")
+
+hist(HeartRate, 
+     main = "Heart rate in BPM", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Heart rate")
+
+names(sleepData)
+hist(SnoringRate, 
+     main = "Snoring rate", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Snoring rate")
+
+hist(RespirationRate, 
+     main = "Respiration in breaths per minute", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Respiration rate")
+
+hist(BodyTemp, 
+     main = "Body temperature in deg F", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Body tem in F")
+
+hist(BloodOxygen, 
+     main = "Blood Oxygen level in %", 
+     col = "blue",
+     ylab = "Frequency",
+     xlab = "Blood oxygen level")
+par(opar)
+par(mfrow = c(3, 3))
 # normality
 with(sleepData, {
   qqnorm(SnoringRate, 
@@ -218,6 +271,12 @@ with(sleepData, {
 with(sleepData, {
   qqnorm(HeartRate, 
          main = "Normality analysis of REM data")
+  qqline(HeartRate)
+})
+
+with(sleepData, {
+  qqnorm(SleepHrs, 
+         main = "Normality analysis of Sleep duration")
   qqline(HeartRate)
 })
 
