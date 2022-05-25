@@ -88,3 +88,105 @@ scatter.smooth(x=HeartRate,
                ylab = "Sleep duration in hours",
                col = "BLUE")
 cor(SleepHrs, HeartRate)
+
+
+# checking for outliers
+opar <- par(no.readonly = TRUE)
+par(mfrow = c(3, 3)) # divide graph area in 3 rows by 2 columns
+names(sleepData)
+boxplot(SnoringRate,
+        main = "Snoring Rate",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(SnoringRate)$out)) # box plot for 'SnoringRate'
+boxplot(RespirationRate,
+        main = "Respiration Rate",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(RespirationRate)$out)) # box plot for 'RespirationRate'
+boxplot(BodyTemp,
+        main = "Body Temperature",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(BodyTemp)$out)) # box plot for 'BodyTemp'
+boxplot(Movement,
+        main = "Movement",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(Movement)$out)) # box plot for 'Movement'
+boxplot(BloodOxygen,
+        main = "Blood Oxygen",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(BloodOxygen)$out)) # box plot for 'BloodOxygen'
+boxplot(REM,
+        main = "REM",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(REM)$out)) # box plot for 'REM'
+boxplot(SleepHrs,
+        main = "SleepHrs",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(SleepHrs)$out)) # box plot for 'SleepHrs'
+boxplot(HeartRate,
+        main = "Heart Rate",
+        sub = paste("Outlier rows: ",
+                    boxplot.stats(HeartRate)$out)) # box plot for 'HeartRate'
+detach(sleepData)
+par(opar)
+
+#####################################################################################################
+# Training and testing
+
+set.seed(1) # ensures we get the same random sample every time
+no_rows_data <- nrow(sleepData) # gets number of rows in sleepData
+sample <- sample(1:no_rows_data, size = round(0.7 * no_rows_data), replace = FALSE) # 70% of dataset
+training_data <- sleepData[sample, ] # assigns 70% of sleepData to training_data
+testing_data <- sleepData[-sample, ] # assigns the remainder to testing_data
+
+
+# building MLR model
+attach(sleepData)
+fit <- lm(SleepHrs ~ HeartRate + RespirationRate + BodyTemp + Movement + BloodOxygen + REM + SnoringRate, data=sleepData)# 
+
+# model evaluation
+summary(fit)
+# heart rate or respiration rate produce NA. This means that they are colinear and one of them adds nothing to the model
+# Therefore one of them must be removed from the model
+
+fit <- lm(SleepHrs ~ HeartRate + BodyTemp + Movement + BloodOxygen + REM + SnoringRate, data=sleepData)
+summary(fit)
+
+confint(fit)
+?confint
+
+# normality and studentized residuals
+library(car)
+par(mfrow = c(1, 1))
+qqPlot(fit, labels=row.names(sleepData), id.method="identify", simulate=TRUE, main="Q-Q Plot")
+
+training_data["35",]
+training_data["253",]
+
+fitted(fit)["35"]
+fitted(fit)["253"]
+
+student_fit <- rstudent(fit)
+hist(student_fit,
+     breaks=10,
+     freq=FALSE,
+     xlab="Studentized Residual",
+     main="Distribution of Errors")
+rug(jitter(student_fit), col="brown")
+curve(dnorm(x, mean=mean(student_fit), sd=sd(student_fit)), add=TRUE, col="blue", lwd=2)
+lines(density(student_fit)$x, density(student_fit)$y, col="red", lwd=2, lty=2)
+legend("topright", legend = c( "Normal Curve", "Kernel Density Curve"), lty=1:2, col=c("blue","red"), cex=.7)
+
+outlierTest(fit) # identified 35 as an outlier
+sleepData <- sleepData[-c(35),] # remove row 35
+
+# split data and rebuild model 
+set.seed(1) # ensures we get the same random sample every time
+no_rows_data <- nrow(sleepData) # gets number of rows in sleepData
+sample <- sample(1:no_rows_data, size = round(0.7 * no_rows_data), replace = FALSE) # 70% of dataset
+training_data <- sleepData[sample, ] # assigns 70% of sleepData to training_data
+testing_data <- sleepData[-sample, ]
+
+# rebuild model
+fit <- lm(sleepData ~ HeartRate + BodyTemp + Movement + BloodOxygen + REM + SnoringRate, data=sleepData)
+outlierTest(fit)
+
