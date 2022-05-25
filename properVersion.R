@@ -177,16 +177,50 @@ lines(density(student_fit)$x, density(student_fit)$y, col="red", lwd=2, lty=2)
 legend("topright", legend = c( "Normal Curve", "Kernel Density Curve"), lty=1:2, col=c("blue","red"), cex=.7)
 
 outlierTest(fit) # identified 35 as an outlier
-sleepData <- sleepData[-c(35),] # remove row 35
+# sleepData <- sleepData[-c(35),] # remove row 35
 
-# split data and rebuild model 
-set.seed(1) # ensures we get the same random sample every time
-no_rows_data <- nrow(sleepData) # gets number of rows in sleepData
-sample <- sample(1:no_rows_data, size = round(0.7 * no_rows_data), replace = FALSE) # 70% of dataset
-training_data <- sleepData[sample, ] # assigns 70% of sleepData to training_data
-testing_data <- sleepData[-sample, ]
+############################################################
 
-# rebuild model
-fit <- lm(sleepData ~ HeartRate + BodyTemp + Movement + BloodOxygen + REM + SnoringRate, data=sleepData)
-outlierTest(fit)
+# linearity
+
+crPlots(fit)
+
+# influencial observations
+cutoff <- 4/(nrow(training_data) - length(fit$coefficients) - 2)
+plot(fit, which = 4, cook.levels = cutoff, col = "blue")
+abline(h = cutoff, lty = 2, col = "red")
+
+avPlots(fit, ask=FALSE)
+
+influencePlot(fit, main="Influence Plot",
+              sub="Circle size is proportional to Cook's distance")
+
+################################################################
+
+# Homoscedasticity
+
+ncvTest(fit)
+
+spreadLevelPlot(fit)
+
+########################################################
+
+# global validation of linear model assumptions
+
+install.packages("gvlma")
+library(gvlma)
+gvmodel <- gvlma(fit)
+summary(gvmodel)
+
+
+###################################################
+
+# multicolinearity
+vif(fit)
+sqrt(vif(fit)) > 2
+
+# to determine which variables are collinear
+myCors <- data.frame(cor(sleepData[1:8], method = "spearman"))
+
+
 
