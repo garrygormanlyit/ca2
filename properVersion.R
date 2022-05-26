@@ -222,5 +222,11 @@ sqrt(vif(fit)) > 2
 # to determine which variables are collinear
 myCors <- data.frame(cor(sleepData[1:8], method = "spearman"))
 
+##################################################
 
+# Transforming variables
+
+library(car)
+summary(powerTransform(training_data$SleepHrs, family = bcPower)) # cant be done as many values in sleepHrs are zero
+# from spreadLevelPlot(fit) - suggested power transformation is 1.497262
 
