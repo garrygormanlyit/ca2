@@ -226,3 +226,65 @@ fit_model2 <- lm(snore_log ~ BodyTemp +
                    mildStress +
                    highStress, data=training_data)
 AIC(fit_model1,fit_model2)
+
+####################################################
+
+# stepwise regression
+
+library(MASS)
+fit_test <- lm(SnoringRate ~ BodyTemp +  
+                 mildStress +
+                 highStress, data=training_data)
+stepAIC(fit_test, direction="backward")
+
+summary(fit_model2)
+
+# all subset regression
+install.packages("leaps")
+library(leaps)
+leaps <-regsubsets(SnoringRate ~ BodyTemp +  
+                     mildStress +
+                     highStress, data=training_data, nbest=4)
+plot(leaps, scale="adjr2")
+
+leaps <-regsubsets(snore_log ~ BodyTemp +  
+                     mildStress +
+                     highStress, data=training_data, nbest=4)
+plot(leaps, scale="adjr2", main = "All subsets regression - log transformed")
+
+####################################################
+# testing how to inverse a log transform
+nums <- c(2,3,4,5,6)
+nums_log <- log(nums)
+nums_log
+converted_nums <- exp(nums_log)
+converted_nums
+
+# model training vs testing
+
+predicted_snoring <- predict(fit_model1, testing_data)
+predicted_logSnore <- predict(fit_model2, testing_data)
+converted_log_snore <- exp(predicted_logSnore)
+
+
+
+actuals_predictions <- data.frame(cbind(actuals = testing_data$SnoringRate, predicted = predicted_snoring))
+head(actuals_predictions)
+
+actuals_predictions_log <- data.frame(cbind(actuals = testing_data$SnoringRate, predicted = converted_log_snore))
+head(actuals_predictions_log)
+
+correlation_accuracy <- cor(actuals_predictions)
+correlation_accuracy
+
+correlation_accuracy_log <- cor(actuals_predictions_log)
+correlation_accuracy_log
+
+min_max_accuracy <- mean(apply(actuals_predictions, 1, min) /apply(actuals_predictions, 1, max))
+min_max_accuracy
+
+min_max_accuracy <- mean(apply(actuals_predictions_log, 1, min) /apply(actuals_predictions_log, 1, max))
+min_max_accuracy
+
+sigma(fit_model1)/ mean(testing_data$SnoringRate)
+sigma(fit_model2)/ mean(testing_data$SnoringRate)
