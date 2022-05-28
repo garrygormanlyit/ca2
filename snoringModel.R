@@ -288,3 +288,91 @@ min_max_accuracy
 
 sigma(fit_model1)/ mean(testing_data$SnoringRate)
 sigma(fit_model2)/ mean(testing_data$SnoringRate)
+
+##########################################################
+
+# Run some output with the final model
+
+summary(sleepData$SnoringRate)
+summary(sleepData$mildStress)
+summary(sleepData$highStress)
+summary(sleepData$BodyTemp)
+
+# test 1 low bodyTemp, mildStress
+df <- data.frame(BodyTemp = c(85), mildStress = c(1), highStress = c(0))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+# test 1 low bodyTemp, highStress
+df <- data.frame(BodyTemp = c(85), mildStress = c(0), highStress = c(1))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+minTemp <- subset(sleepData, BodyTemp <= 88 & mildStress == 1)
+summary(minTemp$SnoringRate)
+minTemp <- subset(sleepData, BodyTemp <= 88 & highStress == 1)
+summary(minTemp$SnoringRate)
+
+# test 2 90 bodyTemp, mildStress
+df <- data.frame(BodyTemp = c(90), mildStress = c(1), highStress = c(0))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+
+df <- data.frame(BodyTemp = c(90), mildStress = c(0), highStress = c(1))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+minMidTemp <- subset(sleepData, BodyTemp >= 88 & BodyTemp <= 92.5 & mildStress == 1)
+summary(minMidTemp$SnoringRate)
+minMidTemp <- subset(sleepData, BodyTemp <= 88 & BodyTemp <= 92.5 & highStress == 1)
+summary(minMidTemp$SnoringRate)
+minMidTemp <- subset(sleepData, BodyTemp <= 88 & BodyTemp <= 92.5)
+summary(minMidTemp$SnoringRate)
+
+# test 3 95 bodyTemp, mildStress
+df <- data.frame(BodyTemp = c(95), mildStress = c(1), highStress = c(0))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+
+df <- data.frame(BodyTemp = c(95), mildStress = c(0), highStress = c(1))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+training_data
+MidHighTemp <- subset(sleepData, BodyTemp >= 92.5 & BodyTemp <= 97 & mildStress == 1)
+summary(MidHighTemp$SnoringRate)
+MidHighTemp <- subset(sleepData, BodyTemp >= 92.5 & BodyTemp <= 97 & highStress == 1)
+summary(MidHighTemp$SnoringRate)
+MidHighTemp <- subset(sleepData, BodyTemp <= 92.5 & BodyTemp <= 97)
+summary(MidHighTemp$SnoringRate)
+MidHighTemp <- subset(training_data, BodyTemp <= 92.5 & BodyTemp <= 97 & highStress == 1)
+summary(MidHighTemp$SnoringRate)
+
+
+# test 4 99 bodyTemp, mildStress
+df <- data.frame(BodyTemp = c(99), mildStress = c(1), highStress = c(0))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+
+df <- data.frame(BodyTemp = c(99), mildStress = c(0), highStress = c(1))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+MidHighTemp <- subset(sleepData, BodyTemp >= 97 & mildStress == 1)
+summary(MidHighTemp$SnoringRate)
+MidHighTemp <- subset(sleepData, BodyTemp >= 97 & highStress == 1)
+summary(MidHighTemp$SnoringRate)
+MidHighTemp <- subset(sleepData, BodyTemp >= 97)
+summary(MidHighTemp$SnoringRate)
+
