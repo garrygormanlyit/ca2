@@ -327,12 +327,32 @@ predicted_snore <- predict(fit_model2, df)
 predicted_snore <- exp(predicted_snore)
 predicted_snore
 
+
 minMidTemp <- subset(sleepData, BodyTemp >= 88 & BodyTemp <= 92.5 & mildStress == 1)
-summary(minMidTemp$SnoringRate)
-minMidTemp <- subset(sleepData, BodyTemp <= 88 & BodyTemp <= 92.5 & highStress == 1)
-summary(minMidTemp$SnoringRate)
-minMidTemp <- subset(sleepData, BodyTemp <= 88 & BodyTemp <= 92.5)
-summary(minMidTemp$SnoringRate)
+summary(minMidTemp$SnoringRate) # 0 obs
+minMidTemp <- subset(sleepData, BodyTemp >= 88 & BodyTemp <= 92.5 & highStress == 1)
+summary(minMidTemp$SnoringRate) # 126
+minMidTemp <- subset(sleepData, BodyTemp >= 88 & BodyTemp <= 92.5)
+summary(minMidTemp$SnoringRate) # 209 obs
+
+# test 2.5 92.5 bodyTemp, mildStress
+df <- data.frame(BodyTemp = c(92.5), mildStress = c(1), highStress = c(0))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+
+df <- data.frame(BodyTemp = c(92.5), mildStress = c(0), highStress = c(1))
+predicted_snore <- predict(fit_model2, df)
+predicted_snore <- exp(predicted_snore)
+predicted_snore
+
+meanTemp <- subset(sleepData, BodyTemp >= 90 & BodyTemp <= 95 & mildStress == 1)
+summary(meanTemp$SnoringRate) # 63
+meanTemp <- subset(sleepData, BodyTemp >= 90 & BodyTemp <= 95 & highStress == 1)
+summary(meanTemp$SnoringRate) # 126
+meanTemp <- subset(sleepData, BodyTemp >= 90 & BodyTemp <= 95)
+summary(meanTemp$SnoringRate) #127
 
 # test 3 95 bodyTemp, mildStress
 df <- data.frame(BodyTemp = c(95), mildStress = c(1), highStress = c(0))
@@ -348,12 +368,12 @@ predicted_snore
 
 training_data
 MidHighTemp <- subset(sleepData, BodyTemp >= 92.5 & BodyTemp <= 97 & mildStress == 1)
-summary(MidHighTemp$SnoringRate)
+summary(MidHighTemp$SnoringRate)# 127 obs
 MidHighTemp <- subset(sleepData, BodyTemp >= 92.5 & BodyTemp <= 97 & highStress == 1)
-summary(MidHighTemp$SnoringRate)
-MidHighTemp <- subset(sleepData, BodyTemp <= 92.5 & BodyTemp <= 97)
-summary(MidHighTemp$SnoringRate)
-MidHighTemp <- subset(training_data, BodyTemp <= 92.5 & BodyTemp <= 97 & highStress == 1)
+summary(MidHighTemp$SnoringRate) # 0 obs
+MidHighTemp <- subset(sleepData, BodyTemp >= 92.5 & BodyTemp <= 97)
+summary(MidHighTemp$SnoringRate) # 262 obs
+MidHighTemp <- subset(training_data, BodyTemp >= 92.5 & BodyTemp <= 97 & highStress == 1)
 summary(MidHighTemp$SnoringRate)
 
 
@@ -376,3 +396,14 @@ summary(MidHighTemp$SnoringRate)
 MidHighTemp <- subset(sleepData, BodyTemp >= 97)
 summary(MidHighTemp$SnoringRate)
 
+mean(sleepData$BodyTemp)
+
+par(mfrow = c(3, 2))
+hist(training_data$BodyTemp, main = "Distribution of body temperature in training data", xlab = "Body temperature in F")
+hist(testing_data$BodyTemp, main = "Distribution of body temperature in testing data", xlab = "Body temperature in F")
+
+hist(training_data$BodyTemp[training_data$mildStress == 1], main = "Distribution of body temperature with mild stress(training)", xlab = "Body temperature in F")
+hist(testing_data$BodyTemp[testing_data$mildStress == 1], main = "Distribution of body temperature with mild stress(testing)", xlab = "Body temperature in F")
+
+hist(training_data$BodyTemp[training_data$highStress == 1], main = "Distribution of body temperature with high stress(training)", xlab = "Body temperature in F")
+hist(testing_data$BodyTemp[testing_data$highStress == 1], main = "Distribution of body temperature with high stress(testing)", xlab = "Body temperature in F")
